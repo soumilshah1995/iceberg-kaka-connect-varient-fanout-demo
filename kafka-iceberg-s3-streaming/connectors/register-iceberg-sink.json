@@ -1,0 +1,43 @@
+{
+  "name": "iceberg-sink",
+  "config": {
+    "connector.class": "org.apache.iceberg.connect.IcebergSinkConnector",
+    "tasks.max": "1",
+    "topics": "orders",
+    "iceberg.catalog.type": "hadoop",
+    "iceberg.catalog.warehouse": "file:/var/iceberg-warehouse",
+
+    "iceberg.tables.dynamic-enabled": "true",
+    "iceberg.tables.auto-create-enabled": "true",
+    "iceberg.tables.route-field": "site_id",
+    "iceberg.tables.default-partition-by": "day(order_date)",
+    "iceberg.tables.auto-create-variant-columns": "event_variant",
+
+    "transforms": "orderDateStringToDate",
+    "transforms.orderDateStringToDate.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.orderDateStringToDate.target.type": "Date",
+    "transforms.orderDateStringToDate.field": "order_date",
+    "transforms.orderDateStringToDate.format": "yyyy-MM-dd",
+    "transforms.orderDateStringToDate.timezone": "UTC",
+
+    "iceberg.tables.auto-create-props.format-version": "3",
+    "iceberg.tables.evolve-schema-enabled": "true",
+    "iceberg.tables.upsert-mode-enabled": "false",
+    "iceberg.control.topic": "iceberg-connector-control-v1",
+
+    "iceberg.control.commit.interval-ms": "5000",
+    "iceberg.control.commit.timeout-ms": "60000",
+
+    "iceberg.connect.group-id": "iceberg-sink-orders-local",
+    "consumer.override.group.id": "iceberg-sink-orders-local",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    "consumer.override.auto.offset.reset": "earliest",
+
+    "errors.log.enable": "true"
+  }
+}

@@ -1,0 +1,29 @@
+
+
+docker compose up --build -d
+python  /workspace/data_producer.py
+
+ ./scripts/register-sink.sh
+
+
+mkdir -p /Users/sshah/IdeaProjects/study-learn/kafka-iceberg-sink-fanout/kafka-iceberg-s3-streaming/iceberg-warehouse
+sudo rm -f /var/iceberg-warehouse
+sudo ln -s /Users/sshah/IdeaProjects/study-learn/kafka-iceberg-sink-fanout/kafka-iceberg-s3-streaming/iceberg-warehouse /var/iceberg-warehouse
+ls -la /var/iceberg-warehouse
+
+
+ Kafka Connect base (docker compose maps connect → localhost:8084)
+export CONNECT=http://localhost:8084
+
+# Pause connector (stop consuming; keeps config & offsets)
+curl -sS -X PUT "$CONNECT/connectors/iceberg-sink/pause"
+
+# Resume connector (start consuming again)
+curl -sS -X PUT "$CONNECT/connectors/iceberg-sink/resume"
+
+# Status
+curl -sS "$CONNECT/connectors/iceberg-sink/status" | jq .
+
+# Optional: delete connector entirely (recreate with ./scripts/register-sink.sh)
+curl -sS -X DELETE "$CONNECT/connectors/iceberg-sink"
+
